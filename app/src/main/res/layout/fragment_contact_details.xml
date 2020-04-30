@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/user"
+    tools:context=".ContactDetailsFragment">
+
+    <ImageView
+        android:id="@+id/user_photo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:contentDescription="/User Photo"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@mipmap/ic_launcher"
+        tools:src="@tools:sample/avatars" />
+
+    <TextView
+        android:id="@+id/user_name"
+        android:layout_width="210dp"
+        android:layout_height="80dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="16dp"
+        android:text="Name"
+        android:textIsSelectable="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.627"
+        app:layout_constraintStart_toEndOf="@+id/user_photo"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/phone_main"
+        android:layout_width="376dp"
+        android:layout_height="22dp"
+        android:layout_marginTop="23dp"
+        android:text="Phone"
+        android:textIsSelectable="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/user_photo" />
+
+    <TextView
+        android:id="@+id/phone_additional"
+        android:layout_width="376dp"
+        android:layout_height="22dp"
+        android:layout_marginTop="20dp"
+        android:text="Phone 2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.457"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/phone_main" />
+
+    <TextView
+        android:id="@+id/email_main"
+        android:layout_width="376dp"
+        android:layout_height="22dp"
+        android:layout_marginTop="20dp"
+        android:text="Email"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.457"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/phone_add" />
+
+    <TextView
+        android:id="@+id/email_additional"
+        android:layout_width="376dp"
+        android:layout_height="22dp"
+        android:layout_marginTop="12dp"
+        android:text="Email 2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.457"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/email_main" />
+
+    <Button
+        android:id="@+id/phone_add"
+        android:layout_width="376dp"
+        android:layout_height="32dp"
+        android:layout_marginTop="20dp"
+        android:text="Add phone"
+        android:textSize="12sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.457"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/phone_additional" />
+
+    <Button
+        android:id="@+id/email_add"
+        android:layout_width="376dp"
+        android:layout_height="32dp"
+        android:layout_marginTop="20dp"
+        android:text="Add email"
+        android:textSize="12sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.457"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/email_additional" />
+
+    <TextView
+        android:id="@+id/user_description"
+        android:layout_width="376dp"
+        android:layout_height="84dp"
+        android:layout_marginTop="16dp"
+        android:text="Description"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/email_add" />
+</androidx.constraintlayout.widget.ConstraintLayout>
