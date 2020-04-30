@@ -37,12 +37,13 @@ public class ContactDetailsFragment extends Fragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         Bundle arguments = getArguments();
         if (arguments != null) {
+            Contact currentContact = ContactListFragment.contacts[getArguments().getInt(CONTACT_ID, 0)];
             TextView name = view.findViewById(R.id.user_name);
-            name.setText(arguments.getString(CONTACT_ID, "Will"));
+            name.setText(currentContact.getName());
             TextView phone = view.findViewById(R.id.phone_main);
-            phone.setText(arguments.getString(CONTACT_ID, "89508528585"));
+            phone.setText(currentContact.getPhone());
             TextView email = view.findViewById(R.id.email_main);
-            email.setText(arguments.getString(CONTACT_ID, "will@yandex.ru"));
+            email.setText(currentContact.getEmail());
         }
     }
 

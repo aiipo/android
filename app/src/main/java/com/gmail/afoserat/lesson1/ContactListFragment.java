@@ -10,6 +10,10 @@ import android.widget.TextView;
 import androidx.fragment.app.Fragment;
 
 public class ContactListFragment extends Fragment {
+    static final Contact[] contacts = {
+            new Contact("Will", "79509509595", "will@yandex.ru"),
+    };
+
     private View.OnClickListener listener = null;
 
     public static ContactListFragment newInstance() {
@@ -29,6 +33,7 @@ public class ContactListFragment extends Fragment {
         super.onCreate(savedInstanceState);
         getActivity().setTitle("List of contacts");
     }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -44,9 +49,10 @@ public class ContactListFragment extends Fragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         TextView name = view.findViewById(R.id.user_name);
-        name.setText("Will");
+        view.setId(0);
+        name.setText(contacts[0].getName());
         TextView phone = view.findViewById(R.id.user_name);
-        phone.setText("79509509595");
+        phone.setText(contacts[0].getPhone());
     }
 
     @Override
