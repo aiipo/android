@@ -24,6 +24,7 @@ public class ContactDetailsFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getActivity().setTitle("Details of the contact");
     }
 
     @Override
@@ -45,4 +46,9 @@ public class ContactDetailsFragment extends Fragment {
         }
     }
 
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        getActivity().setTitle("List of contacts");
+    }
 }
