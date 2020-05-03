@@ -1,9 +1,9 @@
 package com.gmail.afoserat.lesson1;
 
 public class Contact {
-    private String name;
-    private String phone;
-    private String email;
+    private final String name;
+    private final String phone;
+    private final String email;
 
     Contact(String name, String phone, String email) {
         this.name = name;

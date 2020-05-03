@@ -14,7 +14,11 @@ public class ContactListFragment extends Fragment {
             new Contact("Will", "79509509595", "will@yandex.ru"),
     };
 
-    private View.OnClickListener listener = null;
+    private onContactSelectedListener listener = null;
+
+    interface onContactSelectedListener {
+        void onContactSelected(int id);
+    }
 
     public static ContactListFragment newInstance() {
         return new ContactListFragment();
@@ -23,8 +27,8 @@ public class ContactListFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof View.OnClickListener) {
-            listener = (View.OnClickListener) context;
+        if (context instanceof onContactSelectedListener) {
+            listener = (onContactSelectedListener) context;
         }
     }
 
@@ -40,7 +44,12 @@ public class ContactListFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_contact_list, container, false);
         View user = view.findViewById(R.id.user);
         if (listener != null) {
-            user.setOnClickListener(listener);
+            user.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    listener.onContactSelected((Integer) v.getTag());
+                }
+            });
         }
         return view;
     }
@@ -49,7 +58,7 @@ public class ContactListFragment extends Fragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         TextView name = view.findViewById(R.id.user_name);
-        view.setId(0);
+        view.setTag(0);
         name.setText(contacts[0].getName());
         TextView phone = view.findViewById(R.id.user_name);
         phone.setText(contacts[0].getPhone());
