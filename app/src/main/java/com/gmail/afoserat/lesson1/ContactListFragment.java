@@ -39,18 +39,24 @@ public class ContactListFragment extends Fragment {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        getActivity().setTitle("List of contacts");
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_contact_list, container, false);
         View user = view.findViewById(R.id.user);
-        if (listener != null) {
-            user.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
+        user.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (listener != null) {
                     listener.onContactSelected((Integer) v.getTag());
                 }
-            });
-        }
+            }
+        });
         return view;
     }
 

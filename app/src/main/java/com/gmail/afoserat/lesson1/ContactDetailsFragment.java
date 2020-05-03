@@ -46,10 +46,4 @@ public class ContactDetailsFragment extends Fragment {
             email.setText(currentContact.getEmail());
         }
     }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        getActivity().setTitle("List of contacts");
-    }
 }
