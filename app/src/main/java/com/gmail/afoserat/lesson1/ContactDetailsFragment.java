@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.util.concurrent.ExecutionException;
 
 public class ContactDetailsFragment extends Fragment {
     private static final String CONTACT_ID = "CONTACT_ID";
@@ -58,7 +59,12 @@ public class ContactDetailsFragment extends Fragment {
             TextView phone = view.findViewById(R.id.phone_main);
             TextView email = view.findViewById(R.id.email_main);
             int contactId = getArguments().getInt(CONTACT_ID, 0);
-            Contact currentContact = mService.getContactById(contactId);
+            Contact currentContact = null;
+            try {
+                currentContact = mService.getContactById(contactId);
+            } catch (ExecutionException | InterruptedException e) {
+                e.printStackTrace();
+            }
             name.setText(currentContact.getName());
             phone.setText(currentContact.getPhone());
             email.setText(currentContact.getEmail());

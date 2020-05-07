@@ -13,8 +13,11 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.fragment.app.ListFragment;
 
+import java.util.concurrent.ExecutionException;
+
 public class ContactListFragment extends ListFragment {
     ContactsService mService;
+    private Contact[] contacts;
 
     interface serviceAvailable {
         ContactsService getService();
@@ -51,7 +54,11 @@ public class ContactListFragment extends ListFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getActivity().setTitle("List of contacts");
-        final Contact[] contacts = mService.getContacts();
+        try {
+            contacts = mService.getContacts();
+        } catch (ExecutionException | InterruptedException e) {
+            e.printStackTrace();
+        }
         ArrayAdapter<Contact> contactArrayAdapter = new ArrayAdapter<Contact>(getActivity(), 0, contacts) {
             @NonNull
             @Override
