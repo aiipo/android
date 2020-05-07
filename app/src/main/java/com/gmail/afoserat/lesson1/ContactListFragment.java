@@ -2,22 +2,22 @@ package com.gmail.afoserat.lesson1;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 
-import androidx.fragment.app.Fragment;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.fragment.app.ListFragment;
 
-public class ContactListFragment extends Fragment {
-    static final Contact[] contacts = {
-            new Contact("Will", "79509509595", "will@yandex.ru"),
-    };
+public class ContactListFragment extends ListFragment {
+    ContactsService mService;
 
-    private onContactSelectedListener listener = null;
-
-    interface onContactSelectedListener {
-        void onContactSelected(int id);
+    interface serviceAvailable {
+        ContactsService getService();
     }
 
     public static ContactListFragment newInstance() {
@@ -27,52 +27,52 @@ public class ContactListFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof onContactSelectedListener) {
-            listener = (onContactSelectedListener) context;
+        if (context instanceof serviceAvailable) {
+            mService = ((serviceAvailable) context).getService();
         }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mService = null;
+    }
+
+    @Override
+    public void onListItemClick(@NonNull ListView l, @NonNull View v, int position, long id) {
+        ContactDetailsFragment fragment = ContactDetailsFragment.newInstance((int) id);
+        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+        transaction.replace(R.id.main, fragment)
+                .addToBackStack(null)
+                .commit();
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getActivity().setTitle("List of contacts");
+        final Contact[] contacts = mService.getContacts();
+        ArrayAdapter<Contact> contactArrayAdapter = new ArrayAdapter<Contact>(getActivity(), 0, contacts) {
+            @NonNull
+            @Override
+            public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+                if (convertView == null) {
+                    convertView = getLayoutInflater().inflate(R.layout.fragment_contact_list, null, false);
+                }
+                TextView name = convertView.findViewById(R.id.user_name);
+                TextView phone = convertView.findViewById(R.id.user_phone);
+                Contact currentContact = contacts[position];
+                name.setText(currentContact.getName());
+                phone.setText(currentContact.getPhone());
+                return convertView;
+            }
+        };
+        setListAdapter(contactArrayAdapter);
     }
 
     @Override
     public void onResume() {
         super.onResume();
         getActivity().setTitle("List of contacts");
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_contact_list, container, false);
-        View user = view.findViewById(R.id.user);
-        user.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (listener != null) {
-                    listener.onContactSelected((Integer) v.getTag());
-                }
-            }
-        });
-        return view;
-    }
-
-    @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        TextView name = view.findViewById(R.id.user_name);
-        view.setTag(0);
-        name.setText(contacts[0].getName());
-        TextView phone = view.findViewById(R.id.user_name);
-        phone.setText(contacts[0].getPhone());
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        listener = null;
     }
 }
