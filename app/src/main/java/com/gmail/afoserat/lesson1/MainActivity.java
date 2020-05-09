@@ -12,7 +12,7 @@ import android.os.IBinder;
 
 public class MainActivity extends AppCompatActivity implements ContactListFragment.serviceAvailable {
     private ContactsService boundService;
-    private boolean isFirstCreated = false;
+    private boolean isFirstCreated;
     private boolean isBound = false;
 
     private void addContactListFragment() {
@@ -45,11 +45,8 @@ public class MainActivity extends AppCompatActivity implements ContactListFragme
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Intent intent = new Intent(this, ContactsService.class);
-        startService(intent);
         bindService(intent, boundServiceConnection, Context.BIND_AUTO_CREATE);
-        if (savedInstanceState == null) {
-            isFirstCreated = true;
-        }
+        isFirstCreated = savedInstanceState == null;
     }
 
     @Override

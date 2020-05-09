@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
 
+import java.lang.ref.WeakReference;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -27,37 +28,35 @@ public class ContactsService extends Service {
         return myBinder;
     }
 
-    private void waitFuture(Future<?> future) {
-        while (true) {
-            if (future.isDone() || future.isCancelled()) {
-                break;
-            }
-        }
-    }
-
-    public Contact[] getContacts() throws ExecutionException, InterruptedException {
-        Future<Contact[]> future = executorService.submit(new Callable<Contact[]>() {
+    public void getContacts(ContactListFragment.ResultListener callback) {
+        final WeakReference<ContactListFragment.ResultListener> ref = new WeakReference<>(callback);
+        executorService.execute(new Runnable() {
             @Override
-            public Contact[] call() {
-                return Contact.contacts;
-            }
-        });
-        waitFuture(future);
-        return future.get();
-    }
-
-    public Contact getContactById(final int id) throws ExecutionException, InterruptedException {
-        Future<Contact> future = executorService.submit(new Callable<Contact>() {
-            @Override
-            public Contact call() {
-                try {
-                    return Contact.contacts[id];
-                } catch (ArrayIndexOutOfBoundsException e) {
-                    return null;
+            public void run() {
+                ContactListFragment.ResultListener listener = ref.get();
+                if (listener != null) {
+                    listener.onComplete(Contact.contacts);
                 }
             }
         });
-        waitFuture(future);
-        return future.get();
+    }
+
+    public void getContactById(final int id, ContactDetailsFragment.ResultDetailsListener callback) {
+        final WeakReference<ContactDetailsFragment.ResultDetailsListener> ref = new WeakReference<>(callback);
+        executorService.execute(new Runnable() {
+            @Override
+            public void run() {
+                Contact contact;
+                try {
+                    contact = Contact.contacts[id];
+                } catch (ArrayIndexOutOfBoundsException e) {
+                    contact = null;
+                }
+                ContactDetailsFragment.ResultDetailsListener listener = ref.get();
+                if (listener != null) {
+                    listener.onComplete(contact);
+                }
+            }
+        });
     }
 }
