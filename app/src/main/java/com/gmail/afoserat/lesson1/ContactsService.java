@@ -7,15 +7,14 @@ import android.os.IBinder;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 public class ContactsService extends Service {
     private final IBinder myBinder = new myLocalBinder();
-    private final ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(2, 2, 0,
-            TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
+    private final ExecutorService executorService = Executors.newFixedThreadPool(1);
 
     class myLocalBinder extends Binder {
         public ContactsService getService() {
@@ -28,26 +27,29 @@ public class ContactsService extends Service {
         return myBinder;
     }
 
-    @Override
-    public void onTaskRemoved(Intent rootIntent) {
-        super.onTaskRemoved(rootIntent);
-        stopSelf();
+    private void waitFuture(Future<?> future) {
+        while (true) {
+            if (future.isDone() || future.isCancelled()) {
+                break;
+            }
+        }
     }
 
     public Contact[] getContacts() throws ExecutionException, InterruptedException {
-        Future<Contact[]> future = threadPoolExecutor.submit(new Callable<Contact[]>() {
+        Future<Contact[]> future = executorService.submit(new Callable<Contact[]>() {
             @Override
-            public Contact[] call() throws Exception {
+            public Contact[] call() {
                 return Contact.contacts;
             }
         });
+        waitFuture(future);
         return future.get();
     }
 
     public Contact getContactById(final int id) throws ExecutionException, InterruptedException {
-        Future<Contact> future = threadPoolExecutor.submit(new Callable<Contact>() {
+        Future<Contact> future = executorService.submit(new Callable<Contact>() {
             @Override
-            public Contact call() throws Exception {
+            public Contact call() {
                 try {
                     return Contact.contacts[id];
                 } catch (ArrayIndexOutOfBoundsException e) {
@@ -55,6 +57,7 @@ public class ContactsService extends Service {
                 }
             }
         });
+        waitFuture(future);
         return future.get();
     }
 }

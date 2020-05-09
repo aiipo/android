@@ -11,9 +11,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 public class ContactDetailsFragment extends Fragment {
+    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
     private static final String CONTACT_ID = "CONTACT_ID";
     ContactsService mService;
 
@@ -34,8 +39,8 @@ public class ContactDetailsFragment extends Fragment {
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
+    public void onDetach() {
+        super.onDetach();
         mService = null;
     }
 
@@ -58,11 +63,18 @@ public class ContactDetailsFragment extends Fragment {
             TextView name = view.findViewById(R.id.user_name);
             TextView phone = view.findViewById(R.id.phone_main);
             TextView email = view.findViewById(R.id.email_main);
-            int contactId = getArguments().getInt(CONTACT_ID, 0);
+            final int contactId = getArguments().getInt(CONTACT_ID, 0);
             Contact currentContact = null;
             try {
-                currentContact = mService.getContactById(contactId);
-            } catch (ExecutionException | InterruptedException e) {
+                Future<Contact> future = executorService.submit(new Callable<Contact>() {
+                    @Override
+                    public Contact call() throws Exception {
+                        return mService.getContactById(contactId);
+                    }
+                });
+                ContactListFragment.waitFuture(future);
+                currentContact = future.get();
+            } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
             }
             name.setText(currentContact.getName());

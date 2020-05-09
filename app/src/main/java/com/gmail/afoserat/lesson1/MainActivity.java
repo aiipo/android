@@ -12,6 +12,7 @@ import android.os.IBinder;
 
 public class MainActivity extends AppCompatActivity implements ContactListFragment.serviceAvailable {
     private ContactsService boundService;
+    private boolean isFirstCreated = false;
     private boolean isBound = false;
 
     private void addContactListFragment() {
@@ -27,7 +28,9 @@ public class MainActivity extends AppCompatActivity implements ContactListFragme
             ContactsService.myLocalBinder binderBridge = (ContactsService.myLocalBinder) service;
             boundService = binderBridge.getService();
             isBound = true;
-            addContactListFragment();
+            if (isFirstCreated) {
+                addContactListFragment();
+            }
         }
 
         @Override
@@ -41,15 +44,17 @@ public class MainActivity extends AppCompatActivity implements ContactListFragme
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Intent intent = new Intent(this, ContactsService.class);
+        startService(intent);
+        bindService(intent, boundServiceConnection, Context.BIND_AUTO_CREATE);
         if (savedInstanceState == null) {
-            Intent intent = new Intent(this, ContactsService.class);
-            bindService(intent, boundServiceConnection, Context.BIND_AUTO_CREATE);
+            isFirstCreated = true;
         }
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
+    protected void onDestroy() {
+        super.onDestroy();
         if(isBound) {
             unbindService(boundServiceConnection);
             isBound = false;

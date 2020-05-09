@@ -13,9 +13,14 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.fragment.app.ListFragment;
 
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 public class ContactListFragment extends ListFragment {
+    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
     ContactsService mService;
     private Contact[] contacts;
 
@@ -36,9 +41,17 @@ public class ContactListFragment extends ListFragment {
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
+    public void onDetach() {
+        super.onDetach();
         mService = null;
+    }
+
+    static void waitFuture(Future<?> future) {
+        while (true) {
+            if (future.isDone() || future.isCancelled()) {
+                break;
+            }
+        }
     }
 
     @Override
@@ -55,7 +68,14 @@ public class ContactListFragment extends ListFragment {
         super.onCreate(savedInstanceState);
         getActivity().setTitle("List of contacts");
         try {
-            contacts = mService.getContacts();
+            Future<Contact[]> future = executorService.submit(new Callable<Contact[]>() {
+                @Override
+                public Contact[] call() throws Exception {
+                    return mService.getContacts();
+                }
+            });
+            waitFuture(future);
+            contacts = future.get();
         } catch (ExecutionException | InterruptedException e) {
             e.printStackTrace();
         }
