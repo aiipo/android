@@ -6,12 +6,8 @@ import android.os.Binder;
 import android.os.IBinder;
 
 import java.lang.ref.WeakReference;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 
 public class ContactsService extends Service {
     private final IBinder myBinder = new myLocalBinder();

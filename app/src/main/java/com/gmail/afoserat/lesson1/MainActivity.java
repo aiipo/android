@@ -1,7 +1,6 @@
 package com.gmail.afoserat.lesson1;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.FragmentTransaction;
 
 import android.content.ComponentName;
 import android.content.Context;

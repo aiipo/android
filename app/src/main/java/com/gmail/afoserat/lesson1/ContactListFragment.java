@@ -13,16 +13,11 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.fragment.app.ListFragment;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-
 public class ContactListFragment extends ListFragment {
     ContactsService mService;
 
     interface serviceAvailable {
         ContactsService getService();
-
     }
 
     interface ResultListener {
