@@ -51,33 +51,32 @@ public class ContactListFragment extends ListFragment {
                 .commit();
     }
 
-    private ResultListener showContacts = new ResultListener() {
-        @Override
-        public void onComplete(final Contact[] contacts) {
-            ArrayAdapter<Contact> contactArrayAdapter = new ArrayAdapter<Contact>(getActivity(), 0, contacts) {
-                @NonNull
-                @Override
-                public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-                    if (convertView == null) {
-                        convertView = getLayoutInflater().inflate(R.layout.fragment_contact_list, null, false);
-                    }
-                    TextView name = convertView.findViewById(R.id.user_name);
-                    TextView phone = convertView.findViewById(R.id.user_phone);
-                    Contact currentContact = contacts[position];
-                    name.setText(currentContact.getName());
-                    phone.setText(currentContact.getPhone());
-                    return convertView;
-                }
-            };
-            setListAdapter(contactArrayAdapter);
-        }
-    };
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getActivity().setTitle("List of contacts");
         if (mService != null) {
+            ResultListener showContacts = new ResultListener() {
+                @Override
+                public void onComplete(final Contact[] contacts) {
+                    ArrayAdapter<Contact> contactArrayAdapter = new ArrayAdapter<Contact>(getActivity(), 0, contacts) {
+                        @NonNull
+                        @Override
+                        public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+                            if (convertView == null) {
+                                convertView = getLayoutInflater().inflate(R.layout.fragment_contact_list, null, false);
+                            }
+                            TextView name = convertView.findViewById(R.id.user_name);
+                            TextView phone = convertView.findViewById(R.id.user_phone);
+                            Contact currentContact = contacts[position];
+                            name.setText(currentContact.getName());
+                            phone.setText(currentContact.getPhone());
+                            return convertView;
+                        }
+                    };
+                    setListAdapter(contactArrayAdapter);
+                }
+            };
             mService.getContacts(showContacts);
         }
     }

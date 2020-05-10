@@ -53,26 +53,24 @@ public class ContactDetailsFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_contact_details, container, false);
     }
 
-    private ResultDetailsListener showContactDetails = new ResultDetailsListener() {
-        @Override
-        public void onComplete(Contact contact) {
-            View view = getView();
-            if (view != null) {
-                TextView name = view.findViewById(R.id.user_name);
-                TextView phone = view.findViewById(R.id.phone_main);
-                TextView email = view.findViewById(R.id.email_main);
-
-                name.setText(contact.getName());
-                phone.setText(contact.getPhone());
-                email.setText(contact.getEmail());
-            }
-        }
-    };
-
     @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
+    public void onViewCreated(final View view, Bundle savedInstanceState) {
         Bundle arguments = getArguments();
         if (arguments != null) {
+            ResultDetailsListener showContactDetails = new ResultDetailsListener() {
+                @Override
+                public void onComplete(Contact contact) {
+                    if (view != null) {
+                        TextView name = view.findViewById(R.id.user_name);
+                        TextView phone = view.findViewById(R.id.phone_main);
+                        TextView email = view.findViewById(R.id.email_main);
+
+                        name.setText(contact.getName());
+                        phone.setText(contact.getPhone());
+                        email.setText(contact.getEmail());
+                    }
+                }
+            };
             final int contactId = getArguments().getInt(CONTACT_ID, 0);
             mService.getContactById(contactId, showContactDetails);
         }
