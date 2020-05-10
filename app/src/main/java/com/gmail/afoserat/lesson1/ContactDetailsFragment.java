@@ -59,15 +59,22 @@ public class ContactDetailsFragment extends Fragment {
         if (arguments != null) {
             ResultDetailsListener showContactDetails = new ResultDetailsListener() {
                 @Override
-                public void onComplete(Contact contact) {
+                public void onComplete(final Contact contact) {
                     if (view != null) {
-                        TextView name = view.findViewById(R.id.user_name);
-                        TextView phone = view.findViewById(R.id.phone_main);
-                        TextView email = view.findViewById(R.id.email_main);
+                        view.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (view != null) {
+                                    TextView name = view.findViewById(R.id.user_name);
+                                    TextView phone = view.findViewById(R.id.phone_main);
+                                    TextView email = view.findViewById(R.id.email_main);
 
-                        name.setText(contact.getName());
-                        phone.setText(contact.getPhone());
-                        email.setText(contact.getEmail());
+                                    name.setText(contact.getName());
+                                    phone.setText(contact.getPhone());
+                                    email.setText(contact.getEmail());
+                                }
+                            }
+                        });
                     }
                 }
             };
