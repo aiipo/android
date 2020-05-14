@@ -13,6 +13,7 @@ public class MainActivity extends AppCompatActivity implements ContactListFragme
     private ContactsService boundService;
     private boolean isFirstCreated;
     private boolean isBound = false;
+    private static final String CONTACT_ID = "CONTACT_ID";
 
     private void addContactListFragment() {
         getSupportFragmentManager()
@@ -29,6 +30,11 @@ public class MainActivity extends AppCompatActivity implements ContactListFragme
             isBound = true;
             if (isFirstCreated) {
                 addContactListFragment();
+            }
+            Intent receivedIntent = getIntent();
+            if (boundService != null && receivedIntent != null && receivedIntent.hasExtra(CONTACT_ID)) {
+                int id = receivedIntent.getExtras().getInt(CONTACT_ID);
+                showContactDetails(id);
             }
         }
 
@@ -60,5 +66,12 @@ public class MainActivity extends AppCompatActivity implements ContactListFragme
     @Override
     public ContactsService getService() {
         return isBound ? boundService : null;
+    }
+
+    private void showContactDetails(int id) {
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.main, ContactDetailsFragment.newInstance(id))
+                .commit();
     }
 }
