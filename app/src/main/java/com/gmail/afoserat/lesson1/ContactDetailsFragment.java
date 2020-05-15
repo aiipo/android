@@ -13,15 +13,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import java.util.Calendar;
 
 public class ContactDetailsFragment extends Fragment {
     private static final String CONTACT_ID = "CONTACT_ID";
-    private static final String CONTACT_NAME = "CONTACT_NAME";
-    private static final String BIRTHDAY_MESSAGE = "BIRTHDAY_MESSAGE";
-    private static final String BIRTHDAY_MESSAGE_CELEBRATION = "Сегодня день рождения у ";
     private static final int NOTIFY_ABOUT_BIRTHDAY_AT_HOUR = 9;
     private static final int NOTIFY_ABOUT_BIRTHDAY_AT_MINUTES = 30;
     private Contact thisContact;
@@ -65,6 +63,23 @@ public class ContactDetailsFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_contact_details, container, false);
     }
 
+    private Intent getIntentForAlarm() {
+        final String ACTION = "com.gmail.afoserat.action.birthday_notification";
+        Intent intent = new Intent(ACTION);
+        intent.putExtra(CONTACT_ID, thisContact.getId());
+        intent.putExtra(getString(R.string.contact_name), thisContact.getName());
+        intent.putExtra(getString(R.string.birthday_message), getString(R.string.birthday_message__celebration));
+        return intent;
+    }
+
+    private PendingIntent getAlarmIntent() {
+        return PendingIntent.getBroadcast(
+                getActivity(),
+                thisContact.getId(),
+                getIntentForAlarm(),
+                PendingIntent.FLAG_UPDATE_CURRENT
+        );
+    }
     private void setAlarmAboutBirthday() {
         Calendar birthday = thisContact.getBirthdayCalendar();
         AlarmManager alarmManager = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
@@ -72,16 +87,7 @@ public class ContactDetailsFragment extends Fragment {
             birthday.set(Calendar.HOUR_OF_DAY, NOTIFY_ABOUT_BIRTHDAY_AT_HOUR);
             birthday.set(Calendar.MINUTE, NOTIFY_ABOUT_BIRTHDAY_AT_MINUTES);
             birthday.set(Calendar.SECOND, 0);
-            Intent intent = new Intent(getActivity(), ContactBirthdayReceiver.class);
-            intent.putExtra(CONTACT_ID, thisContact.getId());
-            intent.putExtra(CONTACT_NAME, thisContact.getName());
-            intent.putExtra(BIRTHDAY_MESSAGE, BIRTHDAY_MESSAGE_CELEBRATION);
-            PendingIntent alarmIntent = PendingIntent.getBroadcast(
-                    getContext(),
-                    thisContact.getId(),
-                    intent,
-                    PendingIntent.FLAG_UPDATE_CURRENT
-            );
+            PendingIntent alarmIntent = getAlarmIntent();
             alarmManager.setInexactRepeating(
                     AlarmManager.RTC_WAKEUP,
                     birthday.getTimeInMillis(),
@@ -93,16 +99,17 @@ public class ContactDetailsFragment extends Fragment {
 
     private void cancelAlarmAboutBirthday() {
         AlarmManager alarmManager = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
-        Intent intent = new Intent(getActivity(), ContactBirthdayReceiver.class);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(
+        if (alarmManager != null) {
+            alarmManager.cancel(getAlarmIntent());
+        }
+    }
+
+    private boolean isAlarmUp() {
+        return PendingIntent.getBroadcast(
                 getContext(),
                 thisContact.getId(),
-                intent,
-                PendingIntent.FLAG_NO_CREATE
-        );
-        if (alarmManager != null && pendingIntent != null) {
-            alarmManager.cancel(pendingIntent);
-        }
+                getIntentForAlarm(),
+                PendingIntent.FLAG_NO_CREATE) != null;
     }
 
     @Override
@@ -129,7 +136,17 @@ public class ContactDetailsFragment extends Fragment {
                                     email.setText(thisContact.getEmail());
                                     if (thisContact.getBirthday() != null) {
                                         birthday.setText(thisContact.getBirthday());
-                                        notifyBirthday.setChecked(thisContact.getStatusNotificationAboutBirthday());
+                                        notifyBirthday.setChecked(isAlarmUp());
+                                        notifyBirthday.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                                            @Override
+                                            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                                                if (isChecked) {
+                                                    setAlarmAboutBirthday();
+                                                } else {
+                                                    cancelAlarmAboutBirthday();
+                                                }
+                                            }
+                                        });
                                     }
                                 }
                             }
@@ -141,20 +158,4 @@ public class ContactDetailsFragment extends Fragment {
             mService.getContactById(contactId, showContactDetails);
         }
     }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        View view = getView();
-        final CheckBox notifyBirthday = view.findViewById(R.id.user_birthday__checkbox);
-        if (notifyBirthday != null) {
-            if (notifyBirthday.isChecked() && !thisContact.getStatusNotificationAboutBirthday()) {
-                setAlarmAboutBirthday();
-            } else {
-                cancelAlarmAboutBirthday();
-            }
-            thisContact.setNotificationAboutBirthday(notifyBirthday.isChecked());
-        }
-    }
-
 }

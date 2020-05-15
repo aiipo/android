@@ -13,10 +13,6 @@ import static android.app.Activity.RESULT_OK;
 
 public class ContactBirthdayReceiver extends BroadcastReceiver {
     private static final String CHANNEL_ID = "CHANNEL-BIRTHDAY";
-    private static final String CONTACT_ID = "CONTACT_ID";
-    private static final String CONTACT_NAME = "CONTACT_NAME";
-    private static final String BIRTHDAY_MESSAGE = "BIRTHDAY_MESSAGE";
-    private static final String NOTIFICATION_TITLE = "Birthday";
 
     @Override
     public void onReceive(final Context context, final Intent intent) {
@@ -26,18 +22,18 @@ public class ContactBirthdayReceiver extends BroadcastReceiver {
             public void run() {
                 Bundle bundle = intent.getExtras();
                 if (bundle != null) {
-                    int id = bundle.getInt(CONTACT_ID);
-                    String name = bundle.getString(CONTACT_NAME);
-                    String message = bundle.getString(BIRTHDAY_MESSAGE);
+                    int id = bundle.getInt(context.getString(R.string.contact_id));
+                    String name = bundle.getString(context.getString(R.string.contact_name));
+                    String message = bundle.getString(context.getString(R.string.birthday_message));
 
                     Intent contactDetailsIntent = new Intent(context, MainActivity.class);
                     contactDetailsIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    contactDetailsIntent.putExtra(CONTACT_ID, id);
+                    contactDetailsIntent.putExtra(context.getString(R.string.contact_id), id);
                     PendingIntent pendingIntent = PendingIntent.getActivity(context, id, contactDetailsIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
                     NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
                             .setSmallIcon(R.drawable.ic_launcher_foreground)
-                            .setContentTitle(NOTIFICATION_TITLE)
+                            .setContentTitle(context.getString(R.string.notification_title__birthday))
                             .setContentText(message + name)
                             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                             .setContentIntent(pendingIntent)
