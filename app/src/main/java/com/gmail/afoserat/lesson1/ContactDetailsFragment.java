@@ -20,8 +20,8 @@ import java.util.Calendar;
 
 public class ContactDetailsFragment extends Fragment {
     private static final String CONTACT_ID = "CONTACT_ID";
-    private static final int NOTIFY_ABOUT_BIRTHDAY_AT_HOUR = 9;
-    private static final int NOTIFY_ABOUT_BIRTHDAY_AT_MINUTES = 30;
+    private static final int NOTIFY_ABOUT_BIRTHDAY_AT_HOUR = 15;
+    private static final int NOTIFY_ABOUT_BIRTHDAY_AT_MINUTES = 59;
     private Contact thisContact;
     ContactsService mService;
 
@@ -80,6 +80,7 @@ public class ContactDetailsFragment extends Fragment {
                 PendingIntent.FLAG_UPDATE_CURRENT
         );
     }
+
     private void setAlarmAboutBirthday() {
         Calendar birthday = thisContact.getBirthdayCalendar();
         AlarmManager alarmManager = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
@@ -87,11 +88,15 @@ public class ContactDetailsFragment extends Fragment {
             birthday.set(Calendar.HOUR_OF_DAY, NOTIFY_ABOUT_BIRTHDAY_AT_HOUR);
             birthday.set(Calendar.MINUTE, NOTIFY_ABOUT_BIRTHDAY_AT_MINUTES);
             birthday.set(Calendar.SECOND, 0);
+            birthday.set(Calendar.YEAR, Calendar.getInstance().get(Calendar.YEAR));
+            if (birthday.getTimeInMillis() < System.currentTimeMillis()) {
+                birthday.add(Calendar.YEAR, 1);
+            }
             PendingIntent alarmIntent = getAlarmIntent();
             alarmManager.setInexactRepeating(
                     AlarmManager.RTC_WAKEUP,
                     birthday.getTimeInMillis(),
-                    AlarmManager.INTERVAL_DAY * 365,
+                    0,
                     alarmIntent
             );
         }

@@ -5,5 +5,5 @@
     <string name="contact_name" translatable="false">CONTACT_NAME</string>
     <string name="birthday_message" translatable="false">BIRTHDAY_MESSAGE</string>
     <string name="notification_title__birthday">Birthday</string>
-    <string name="birthday_message__celebration">Сегодня день рождения у </string>
+    <string name="birthday_message__celebration">Сегодня день рождения у</string>
 </resources>
