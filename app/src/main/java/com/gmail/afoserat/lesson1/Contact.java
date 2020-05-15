@@ -8,7 +8,6 @@ public class Contact {
     private final String phone;
     private final String email;
     private Calendar birthday = Calendar.getInstance();
-    private boolean notifyAboutBirthday = false;
 
     static final Contact[] contacts = {
         new Contact("Will", "79509509595", "will@yandex.ru"),
@@ -58,10 +57,6 @@ public class Contact {
         return this.birthday;
     }
 
-    public boolean getStatusNotificationAboutBirthday() {
-        return this.notifyAboutBirthday;
-    }
-
     public int getId() {
         for (int i = 0; i < contacts.length; i++) {
             if (contacts[i] == this) {
@@ -69,9 +64,5 @@ public class Contact {
             }
         }
         return -1;
-    }
-
-    public void setNotificationAboutBirthday(Boolean status) {
-        this.notifyAboutBirthday = status;
     }
 }
