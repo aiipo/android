@@ -101,6 +101,7 @@ public class ContactDetailsFragment extends Fragment {
         AlarmManager alarmManager = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
         if (alarmManager != null) {
             alarmManager.cancel(getAlarmIntent());
+            getAlarmIntent().cancel();
         }
     }
 
