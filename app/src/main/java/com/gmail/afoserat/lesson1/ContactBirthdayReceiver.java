@@ -1,5 +1,6 @@
 package com.gmail.afoserat.lesson1;
 
+import android.app.AlarmManager;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -9,10 +10,24 @@ import android.os.Bundle;
 
 import androidx.core.app.NotificationCompat;
 
+import java.util.Calendar;
+
 import static android.app.Activity.RESULT_OK;
 
 public class ContactBirthdayReceiver extends BroadcastReceiver {
     private static final String CHANNEL_ID = "CHANNEL-BIRTHDAY";
+
+    private void setAlarmOnNextYear(Context context, Intent intent, int id, String message, String name) {
+        Intent alarmIntent = new Intent(intent.getAction());
+        alarmIntent.putExtra(context.getString(R.string.contact_id), id);
+        alarmIntent.putExtra(context.getString(R.string.contact_name), name);
+        alarmIntent.putExtra(context.getString(R.string.birthday_message), message);
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        PendingIntent alarmPendingIntent = PendingIntent.getBroadcast(context, id, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        Calendar nextBirthday = Calendar.getInstance();
+        nextBirthday.add(Calendar.YEAR, 1);
+        alarmManager.set(AlarmManager.RTC, nextBirthday.getTimeInMillis(), alarmPendingIntent);
+    }
 
     @Override
     public void onReceive(final Context context, final Intent intent) {
@@ -40,6 +55,7 @@ public class ContactBirthdayReceiver extends BroadcastReceiver {
                             .setAutoCancel(true);
                     NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
                     notificationManager.notify(id, builder.build());
+                    setAlarmOnNextYear(context, intent, id, message, name);
                 }
                 result.setResultCode(RESULT_OK);
                 result.finish();

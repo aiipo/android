@@ -93,12 +93,7 @@ public class ContactDetailsFragment extends Fragment {
                 birthday.add(Calendar.YEAR, 1);
             }
             PendingIntent alarmIntent = getAlarmIntent();
-            alarmManager.setInexactRepeating(
-                    AlarmManager.RTC_WAKEUP,
-                    birthday.getTimeInMillis(),
-                    0,
-                    alarmIntent
-            );
+            alarmManager.set(AlarmManager.RTC_WAKEUP, birthday.getTimeInMillis(), alarmIntent);
         }
     }
 
