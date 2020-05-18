@@ -16,6 +16,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.TextView;
 
+import java.lang.ref.WeakReference;
 import java.util.Calendar;
 
 public class ContactDetailsFragment extends Fragment {
@@ -114,23 +115,25 @@ public class ContactDetailsFragment extends Fragment {
     }
 
     @Override
-    public void onViewCreated(final View view, Bundle savedInstanceState) {
+    public void onViewCreated(View view, Bundle savedInstanceState) {
         Bundle arguments = getArguments();
+        final WeakReference<View> refView = new WeakReference<>(view);
         if (arguments != null) {
             ResultDetailsListener showContactDetails = new ResultDetailsListener() {
                 @Override
                 public void onComplete(Contact contact) {
                     thisContact = contact;
-                    if (view != null) {
-                        view.post(new Runnable() {
+                    final View v = refView.get();
+                    if (v != null) {
+                        v.post(new Runnable() {
                             @Override
                             public void run() {
-                                if (view != null) {
-                                    TextView name = view.findViewById(R.id.user_name);
-                                    TextView phone = view.findViewById(R.id.phone_main);
-                                    TextView email = view.findViewById(R.id.email_main);
-                                    TextView birthday = view.findViewById(R.id.user_birthday);
-                                    CheckBox notifyBirthday = view.findViewById(R.id.user_birthday__checkbox);
+                                if (v != null) {
+                                    TextView name = v.findViewById(R.id.user_name);
+                                    TextView phone = v.findViewById(R.id.phone_main);
+                                    TextView email = v.findViewById(R.id.email_main);
+                                    TextView birthday = v.findViewById(R.id.user_birthday);
+                                    CheckBox notifyBirthday = v.findViewById(R.id.user_birthday__checkbox);
 
                                     name.setText(thisContact.getName());
                                     phone.setText(thisContact.getPhone());
