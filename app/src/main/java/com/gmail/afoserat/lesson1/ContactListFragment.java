@@ -13,6 +13,8 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.fragment.app.ListFragment;
 
+import java.lang.ref.WeakReference;
+
 public class ContactListFragment extends ListFragment {
     ContactsService mService;
 
@@ -58,38 +60,38 @@ public class ContactListFragment extends ListFragment {
     }
 
     @Override
-    public void onViewCreated(@NonNull final View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        final WeakReference<View> refView = new WeakReference<>(view);
         if (mService != null) {
             ResultListener showContacts = new ResultListener() {
                 @Override
                 public void onComplete(final Contact[] contacts) {
-                    if (view != null) {
-                        view.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                if (getActivity() != null) {
-                                    ArrayAdapter<Contact> contactArrayAdapter = new ArrayAdapter<Contact>(getActivity(), 0, contacts) {
-                                        @NonNull
-                                        @Override
-                                        public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-                                            if (convertView == null) {
-                                                convertView = getLayoutInflater().inflate(R.layout.fragment_contact_list, null, false);
-                                            }
-                                            TextView name = convertView.findViewById(R.id.user_name);
-                                            TextView phone = convertView.findViewById(R.id.user_phone);
-
-                                            Contact currentContact = contacts[position];
-                                            name.setText(currentContact.getName());
-                                            phone.setText(currentContact.getPhone());
-                                            return convertView;
+                    final View v = refView.get();
+                    v.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (getActivity() != null) {
+                                ArrayAdapter<Contact> contactArrayAdapter = new ArrayAdapter<Contact>(getActivity(), 0, contacts) {
+                                    @NonNull
+                                    @Override
+                                    public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+                                        if (convertView == null) {
+                                            convertView = getLayoutInflater().inflate(R.layout.fragment_contact_list, null, false);
                                         }
-                                    };
-                                    setListAdapter(contactArrayAdapter);
-                                }
+                                        TextView name = convertView.findViewById(R.id.user_name);
+                                        TextView phone = convertView.findViewById(R.id.user_phone);
+
+                                        Contact currentContact = contacts[position];
+                                        name.setText(currentContact.getName());
+                                        phone.setText(currentContact.getPhone());
+                                        return convertView;
+                                    }
+                                };
+                                setListAdapter(contactArrayAdapter);
                             }
-                        });
-                    }
+                        }
+                    });
                 }
             };
             mService.getContacts(showContacts);
