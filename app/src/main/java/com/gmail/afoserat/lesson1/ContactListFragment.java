@@ -54,7 +54,7 @@ public class ContactListFragment extends ListFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getActivity().setTitle("List of contacts");
+        getActivity().setTitle(R.string.toolbar_title_contactList);
     }
 
     @Override
@@ -99,6 +99,6 @@ public class ContactListFragment extends ListFragment {
     @Override
     public void onResume() {
         super.onResume();
-        getActivity().setTitle("List of contacts");
+        getActivity().setTitle(R.string.toolbar_title_contactList);
     }
 }

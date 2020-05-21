@@ -1,6 +1,9 @@
 <resources>
     <string name="app_name">Lesson 1</string>
 
+    <string name="toolbar_title_contactList">List of contacts</string>
+    <string name="toolbar_title_contactDetails">Details of the contact</string>
+
     <string name="contact_id" translatable="false">CONTACT_ID</string>
     <string name="contact_name" translatable="false">CONTACT_NAME</string>
     <string name="birthday_message" translatable="false">BIRTHDAY_MESSAGE</string>
