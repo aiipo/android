@@ -1,15 +1,21 @@
 package com.gmail.afoserat.lesson1;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
+import android.Manifest;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity implements ContactListFragment.serviceAvailable {
+    private static final int MY_PERMISSIONS_REQUEST_READ_CONTACTS = 1;
     private ContactsService boundService;
     private boolean isFirstCreated;
     private boolean isBound = false;
@@ -45,12 +51,24 @@ public class MainActivity extends AppCompatActivity implements ContactListFragme
         }
     };
 
+    private void bindContactService() {
+        Intent intent = new Intent(this, ContactsService.class);
+        bindService(intent, boundServiceConnection, Context.BIND_AUTO_CREATE);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Intent intent = new Intent(this, ContactsService.class);
-        bindService(intent, boundServiceConnection, Context.BIND_AUTO_CREATE);
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.READ_CONTACTS)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.READ_CONTACTS},
+                    MY_PERMISSIONS_REQUEST_READ_CONTACTS);
+        } else {
+            bindContactService();
+        }
         isFirstCreated = savedInstanceState == null;
     }
 
@@ -60,6 +78,20 @@ public class MainActivity extends AppCompatActivity implements ContactListFragme
         if(isBound) {
             unbindService(boundServiceConnection);
             isBound = false;
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case MY_PERMISSIONS_REQUEST_READ_CONTACTS: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    bindContactService();
+                } else {
+                    Toast.makeText(getApplicationContext(), R.string.allow_read_contacts, Toast.LENGTH_SHORT).show();
+                }
+                break;
+            }
         }
     }
 

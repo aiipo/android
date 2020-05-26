@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -14,6 +15,7 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.fragment.app.ListFragment;
 
 import java.lang.ref.WeakReference;
+import java.util.Arrays;
 
 public class ContactListFragment extends ListFragment {
     ContactsService mService;
@@ -80,11 +82,18 @@ public class ContactListFragment extends ListFragment {
                                             convertView = getLayoutInflater().inflate(R.layout.fragment_contact_list, null, false);
                                         }
                                         TextView name = convertView.findViewById(R.id.user_name);
-                                        TextView phone = convertView.findViewById(R.id.user_phone);
 
                                         Contact currentContact = contacts[position];
                                         name.setText(currentContact.getName());
-                                        phone.setText(currentContact.getPhone());
+                                        System.out.println(Arrays.toString(currentContact.getPhones()));
+                                        if (currentContact.getPhones().length > 0) {
+                                            TextView phone = convertView.findViewById(R.id.user_phone);
+                                            phone.setText(currentContact.getPhones()[0]);
+                                        }
+                                        if (currentContact.getImageUri() != null) {
+                                            ImageView avatar = convertView.findViewById(R.id.user_photo);
+                                            avatar.setImageURI(currentContact.getImageUri());
+                                        }
                                         return convertView;
                                     }
                                 };
