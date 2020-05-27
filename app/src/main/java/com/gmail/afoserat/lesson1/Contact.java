@@ -6,28 +6,28 @@ import java.util.Calendar;
 import java.util.Locale;
 
 public class Contact {
-    private final int id;
+    private final String id;
     private final String name;
     private final String[] phones;
     private final String[] emails;
     private Uri imageUri = null;
     private Calendar birthday = null;
 
-    Contact(int id, String name, String[] phones, String[] emails) {
+    Contact(String id, String name, String[] phones, String[] emails) {
         this.id = id;
         this.name = name;
         this.phones = phones;
         this.emails = emails;
     }
 
-    Contact(int id, String name, String[] phones, String[] emails, int month, int day) {
-        this(id, name, phones, emails);
+    Contact(String id, String name, String[] phones, String[] emails, Uri imageUri, Calendar birthday) {
+        this(id, name, phones, emails, imageUri);
         this.birthday = Calendar.getInstance();
-        this.birthday.set(Calendar.MONTH, month);
-        this.birthday.set(Calendar.DAY_OF_MONTH, day);
+        this.birthday.set(Calendar.MONTH, birthday.get(Calendar.MONTH));
+        this.birthday.set(Calendar.DAY_OF_MONTH, birthday.get(Calendar.DAY_OF_MONTH));
     }
 
-    Contact(int id, String name, String[] phones, String[] emails, Uri imageUri) {
+    Contact(String id, String name, String[] phones, String[] emails, Uri imageUri) {
         this(id, name, phones, emails);
         this.imageUri = imageUri;
     }
@@ -60,7 +60,7 @@ public class Contact {
         return this.birthday;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 }

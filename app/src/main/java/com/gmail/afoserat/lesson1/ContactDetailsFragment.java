@@ -31,10 +31,10 @@ public class ContactDetailsFragment extends Fragment {
         void onComplete(Contact contact);
     }
 
-    public static ContactDetailsFragment newInstance(int id) {
+    public static ContactDetailsFragment newInstance(String id) {
         ContactDetailsFragment fragment = new ContactDetailsFragment();
         Bundle args = new Bundle();
-        args.putInt(CONTACT_ID, id + 1);
+        args.putString(CONTACT_ID, id);
         fragment.setArguments(args);
         return fragment;
     }
@@ -77,7 +77,7 @@ public class ContactDetailsFragment extends Fragment {
     private PendingIntent getAlarmIntent() {
         return PendingIntent.getBroadcast(
                 getActivity(),
-                thisContact.getId(),
+                Integer.parseInt(thisContact.getId()),
                 getIntentForAlarm(),
                 PendingIntent.FLAG_UPDATE_CURRENT
         );
@@ -110,7 +110,7 @@ public class ContactDetailsFragment extends Fragment {
     private boolean isAlarmUp() {
         return PendingIntent.getBroadcast(
                 getContext(),
-                thisContact.getId(),
+                Integer.parseInt(thisContact.getId()),
                 getIntentForAlarm(),
                 PendingIntent.FLAG_NO_CREATE) != null;
     }
@@ -123,51 +123,53 @@ public class ContactDetailsFragment extends Fragment {
             ResultDetailsListener showContactDetails = new ResultDetailsListener() {
                 @Override
                 public void onComplete(Contact contact) {
-                    thisContact = contact;
-                    final View v = refView.get();
-                    if (v != null && thisContact != null) {
-                        v.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                if (v != null) {
-                                    TextView name = v.findViewById(R.id.user_name);
-                                    name.setText(thisContact.getName());
-                                    if (thisContact.getPhones().length > 0) {
-                                        TextView phone = v.findViewById(R.id.phone_main);
-                                        phone.setText(thisContact.getPhones()[0]);
-                                    }
-                                    if (thisContact.getEmails().length > 0) {
-                                        TextView email = v.findViewById(R.id.email_main);
-                                        email.setText(thisContact.getEmails()[0]);
-                                    }
-                                    if (thisContact.getImageUri() != null) {
-                                        ImageView avatar = v.findViewById(R.id.user_photo);
-                                        avatar.setImageURI(thisContact.getImageUri());
-                                    }
-                                    if (thisContact.getBirthday() != null) {
-                                        TextView birthday = v.findViewById(R.id.user_birthday);
-                                        CheckBox notifyBirthday = v.findViewById(R.id.user_birthday__checkbox);
+                    if (refView != null) {
+                        thisContact = contact;
+                        final View v = refView.get();
+                        if (v != null && thisContact != null) {
+                            v.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (v != null) {
+                                        TextView name = v.findViewById(R.id.user_name);
+                                        name.setText(thisContact.getName());
+                                        if (thisContact.getPhones().length > 0) {
+                                            TextView phone = v.findViewById(R.id.phone_main);
+                                            phone.setText(thisContact.getPhones()[0]);
+                                        }
+                                        if (thisContact.getEmails().length > 0) {
+                                            TextView email = v.findViewById(R.id.email_main);
+                                            email.setText(thisContact.getEmails()[0]);
+                                        }
+                                        if (thisContact.getImageUri() != null) {
+                                            ImageView avatar = v.findViewById(R.id.user_photo);
+                                            avatar.setImageURI(thisContact.getImageUri());
+                                        }
+                                        if (thisContact.getBirthday() != null) {
+                                            TextView birthday = v.findViewById(R.id.user_birthday);
+                                            CheckBox notifyBirthday = v.findViewById(R.id.user_birthday__checkbox);
 
-                                        birthday.setText(thisContact.getBirthday());
-                                        notifyBirthday.setChecked(isAlarmUp());
-                                        notifyBirthday.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                                            @Override
-                                            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                                                if (isChecked) {
-                                                    setAlarmAboutBirthday();
-                                                } else {
-                                                    cancelAlarmAboutBirthday();
+                                            birthday.setText(thisContact.getBirthday());
+                                            notifyBirthday.setChecked(isAlarmUp());
+                                            notifyBirthday.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                                                @Override
+                                                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                                                    if (isChecked) {
+                                                        setAlarmAboutBirthday();
+                                                    } else {
+                                                        cancelAlarmAboutBirthday();
+                                                    }
                                                 }
-                                            }
-                                        });
+                                            });
+                                        }
                                     }
                                 }
-                            }
-                        });
+                            });
+                        }
                     }
                 }
             };
-            final int contactId = getArguments().getInt(CONTACT_ID, 0);
+            final String contactId = arguments.getString(CONTACT_ID);
             mService.getContactById(contactId, showContactDetails);
         }
     }

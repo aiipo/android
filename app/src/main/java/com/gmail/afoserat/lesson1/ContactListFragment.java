@@ -48,7 +48,7 @@ public class ContactListFragment extends ListFragment {
 
     @Override
     public void onListItemClick(@NonNull ListView l, @NonNull View v, int position, long id) {
-        ContactDetailsFragment fragment = ContactDetailsFragment.newInstance((int) id);
+        ContactDetailsFragment fragment = ContactDetailsFragment.newInstance((String) v.getTag(R.string.contact_id));
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
         transaction.replace(R.id.main, fragment)
                 .addToBackStack(null)
@@ -69,38 +69,41 @@ public class ContactListFragment extends ListFragment {
             ResultListener showContacts = new ResultListener() {
                 @Override
                 public void onComplete(final Contact[] contacts) {
-                    final View v = refView.get();
-                    v.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (getActivity() != null) {
-                                ArrayAdapter<Contact> contactArrayAdapter = new ArrayAdapter<Contact>(getActivity(), 0, contacts) {
-                                    @NonNull
-                                    @Override
-                                    public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-                                        if (convertView == null) {
-                                            convertView = getLayoutInflater().inflate(R.layout.fragment_contact_list, null, false);
-                                        }
-                                        TextView name = convertView.findViewById(R.id.user_name);
+                    if (refView != null) {
+                        final View v = refView.get();
+                        v.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (getActivity() != null) {
+                                    ArrayAdapter<Contact> contactArrayAdapter = new ArrayAdapter<Contact>(getActivity(), 0, contacts) {
+                                        @NonNull
+                                        @Override
+                                        public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+                                            if (convertView == null) {
+                                                convertView = getLayoutInflater().inflate(R.layout.fragment_contact_list, null, false);
+                                            }
+                                            TextView name = convertView.findViewById(R.id.user_name);
 
-                                        Contact currentContact = contacts[position];
-                                        name.setText(currentContact.getName());
-                                        System.out.println(Arrays.toString(currentContact.getPhones()));
-                                        if (currentContact.getPhones().length > 0) {
-                                            TextView phone = convertView.findViewById(R.id.user_phone);
-                                            phone.setText(currentContact.getPhones()[0]);
+                                            Contact currentContact = contacts[position];
+                                            convertView.setTag(R.string.contact_id, currentContact.getId());
+
+                                            name.setText(currentContact.getName());
+                                            if (currentContact.getPhones().length > 0) {
+                                                TextView phone = convertView.findViewById(R.id.user_phone);
+                                                phone.setText(currentContact.getPhones()[0]);
+                                            }
+                                            if (currentContact.getImageUri() != null) {
+                                                ImageView avatar = convertView.findViewById(R.id.user_photo);
+                                                avatar.setImageURI(currentContact.getImageUri());
+                                            }
+                                            return convertView;
                                         }
-                                        if (currentContact.getImageUri() != null) {
-                                            ImageView avatar = convertView.findViewById(R.id.user_photo);
-                                            avatar.setImageURI(currentContact.getImageUri());
-                                        }
-                                        return convertView;
-                                    }
-                                };
-                                setListAdapter(contactArrayAdapter);
+                                    };
+                                    setListAdapter(contactArrayAdapter);
+                                }
                             }
-                        }
-                    });
+                        });
+                    }
                 }
             };
             mService.getContacts(showContacts);

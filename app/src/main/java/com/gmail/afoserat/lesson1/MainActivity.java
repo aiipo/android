@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity implements ContactListFragme
             }
             Intent receivedIntent = getIntent();
             if (boundService != null && receivedIntent != null && receivedIntent.hasExtra(CONTACT_ID)) {
-                int id = receivedIntent.getExtras().getInt(CONTACT_ID);
+                String id = receivedIntent.getExtras().getString(CONTACT_ID);
                 showContactDetails(id);
             }
         }
@@ -100,7 +100,7 @@ public class MainActivity extends AppCompatActivity implements ContactListFragme
         return isBound ? boundService : null;
     }
 
-    private void showContactDetails(int id) {
+    private void showContactDetails(String id) {
         getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.main, ContactDetailsFragment.newInstance(id))
