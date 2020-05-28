@@ -77,7 +77,7 @@ public class ContactDetailsFragment extends Fragment {
     private PendingIntent getAlarmIntent() {
         return PendingIntent.getBroadcast(
                 getActivity(),
-                Integer.parseInt(thisContact.getId()),
+                thisContact.getId().hashCode(),
                 getIntentForAlarm(),
                 PendingIntent.FLAG_UPDATE_CURRENT
         );
@@ -110,7 +110,7 @@ public class ContactDetailsFragment extends Fragment {
     private boolean isAlarmUp() {
         return PendingIntent.getBroadcast(
                 getContext(),
-                Integer.parseInt(thisContact.getId()),
+                thisContact.getId().hashCode(),
                 getIntentForAlarm(),
                 PendingIntent.FLAG_NO_CREATE) != null;
     }
