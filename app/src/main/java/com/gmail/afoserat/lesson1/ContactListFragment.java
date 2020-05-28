@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -12,6 +13,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.fragment.app.ListFragment;
+
+import java.lang.ref.WeakReference;
+import java.util.Arrays;
 
 public class ContactListFragment extends ListFragment {
     ContactsService mService;
@@ -44,7 +48,7 @@ public class ContactListFragment extends ListFragment {
 
     @Override
     public void onListItemClick(@NonNull ListView l, @NonNull View v, int position, long id) {
-        ContactDetailsFragment fragment = ContactDetailsFragment.newInstance((int) id);
+        ContactDetailsFragment fragment = ContactDetailsFragment.newInstance((String) v.getTag(R.string.contact_id));
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
         transaction.replace(R.id.main, fragment)
                 .addToBackStack(null)
@@ -54,18 +58,20 @@ public class ContactListFragment extends ListFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getActivity().setTitle("List of contacts");
+        getActivity().setTitle(R.string.toolbar_title_contactList);
     }
 
     @Override
-    public void onViewCreated(@NonNull final View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        final WeakReference<View> refView = new WeakReference<>(view);
         if (mService != null) {
             ResultListener showContacts = new ResultListener() {
                 @Override
                 public void onComplete(final Contact[] contacts) {
-                    if (view != null) {
-                        view.post(new Runnable() {
+                    if (refView != null) {
+                        final View v = refView.get();
+                        v.post(new Runnable() {
                             @Override
                             public void run() {
                                 if (getActivity() != null) {
@@ -77,11 +83,19 @@ public class ContactListFragment extends ListFragment {
                                                 convertView = getLayoutInflater().inflate(R.layout.fragment_contact_list, null, false);
                                             }
                                             TextView name = convertView.findViewById(R.id.user_name);
-                                            TextView phone = convertView.findViewById(R.id.user_phone);
 
                                             Contact currentContact = contacts[position];
+                                            convertView.setTag(R.string.contact_id, currentContact.getId());
+
                                             name.setText(currentContact.getName());
-                                            phone.setText(currentContact.getPhone());
+                                            if (currentContact.getPhones().length > 0) {
+                                                TextView phone = convertView.findViewById(R.id.user_phone);
+                                                phone.setText(currentContact.getPhones()[0]);
+                                            }
+                                            if (currentContact.getImageUri() != null) {
+                                                ImageView avatar = convertView.findViewById(R.id.user_photo);
+                                                avatar.setImageURI(currentContact.getImageUri());
+                                            }
                                             return convertView;
                                         }
                                     };
@@ -99,6 +113,6 @@ public class ContactListFragment extends ListFragment {
     @Override
     public void onResume() {
         super.onResume();
-        getActivity().setTitle("List of contacts");
+        getActivity().setTitle(R.string.toolbar_title_contactList);
     }
 }
