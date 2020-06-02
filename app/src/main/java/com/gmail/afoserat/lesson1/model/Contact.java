@@ -1,4 +1,4 @@
-package com.gmail.afoserat.lesson1;
+package com.gmail.afoserat.lesson1.model;
 
 import android.net.Uri;
 
@@ -13,21 +13,21 @@ public class Contact {
     private Uri imageUri = null;
     private Calendar birthday = null;
 
-    Contact(String id, String name, String[] phones, String[] emails) {
+    public Contact(String id, String name, String[] phones, String[] emails) {
         this.id = id;
         this.name = name;
         this.phones = phones;
         this.emails = emails;
     }
 
-    Contact(String id, String name, String[] phones, String[] emails, Uri imageUri, Calendar birthday) {
+    public Contact(String id, String name, String[] phones, String[] emails, Uri imageUri, Calendar birthday) {
         this(id, name, phones, emails, imageUri);
         this.birthday = Calendar.getInstance();
         this.birthday.set(Calendar.MONTH, birthday.get(Calendar.MONTH));
         this.birthday.set(Calendar.DAY_OF_MONTH, birthday.get(Calendar.DAY_OF_MONTH));
     }
 
-    Contact(String id, String name, String[] phones, String[] emails, Uri imageUri) {
+    public Contact(String id, String name, String[] phones, String[] emails, Uri imageUri) {
         this(id, name, phones, emails);
         this.imageUri = imageUri;
     }

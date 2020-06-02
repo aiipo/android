@@ -1,4 +1,4 @@
-package com.gmail.afoserat.lesson1;
+package com.gmail.afoserat.lesson1.views;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -8,6 +8,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,6 +18,10 @@ import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.gmail.afoserat.lesson1.R;
+import com.gmail.afoserat.lesson1.model.Contact;
+import com.gmail.afoserat.lesson1.viewmodels.ContactDetailsViewModel;
+
 import java.lang.ref.WeakReference;
 import java.util.Calendar;
 
@@ -25,11 +30,7 @@ public class ContactDetailsFragment extends Fragment {
     private static final int NOTIFY_ABOUT_BIRTHDAY_AT_HOUR = 15;
     private static final int NOTIFY_ABOUT_BIRTHDAY_AT_MINUTES = 59;
     private Contact thisContact;
-    ContactsService mService;
-
-    interface ResultDetailsListener {
-        void onComplete(Contact contact);
-    }
+    ContactDetailsViewModel model;
 
     public static ContactDetailsFragment newInstance(String id) {
         ContactDetailsFragment fragment = new ContactDetailsFragment();
@@ -40,23 +41,16 @@ public class ContactDetailsFragment extends Fragment {
     }
 
     @Override
-    public void onAttach(@NonNull Context context) {
-        super.onAttach(context);
-        if (context instanceof ContactListFragment.serviceAvailable) {
-            mService = ((ContactListFragment.serviceAvailable) context).getService();
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mService = null;
-    }
-
-    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getActivity().setTitle(R.string.toolbar_title_contactDetails);
+        model = new ContactDetailsViewModel(requireActivity().getApplication());
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        model = null;
     }
 
     @Override
@@ -120,9 +114,12 @@ public class ContactDetailsFragment extends Fragment {
         Bundle arguments = getArguments();
         final WeakReference<View> refView = new WeakReference<>(view);
         if (arguments != null) {
-            ResultDetailsListener showContactDetails = new ResultDetailsListener() {
+            final String contactId = arguments.getString(CONTACT_ID);
+            final CheckBox notifyBirthday = view.findViewById(R.id.user_birthday__checkbox);
+            setOnCheckedChangeListenerBirthday(notifyBirthday);
+            model.getContact(contactId).observe(getViewLifecycleOwner(), new Observer<Contact>() {
                 @Override
-                public void onComplete(Contact contact) {
+                public void onChanged(Contact contact) {
                     if (refView != null) {
                         thisContact = contact;
                         final View v = refView.get();
@@ -147,20 +144,8 @@ public class ContactDetailsFragment extends Fragment {
                                         }
                                         if (thisContact.getBirthday() != null) {
                                             TextView birthday = v.findViewById(R.id.user_birthday);
-                                            CheckBox notifyBirthday = v.findViewById(R.id.user_birthday__checkbox);
-
                                             birthday.setText(thisContact.getBirthday());
                                             notifyBirthday.setChecked(isAlarmUp());
-                                            notifyBirthday.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                                                @Override
-                                                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                                                    if (isChecked) {
-                                                        setAlarmAboutBirthday();
-                                                    } else {
-                                                        cancelAlarmAboutBirthday();
-                                                    }
-                                                }
-                                            });
                                         }
                                     }
                                 }
@@ -168,9 +153,20 @@ public class ContactDetailsFragment extends Fragment {
                         }
                     }
                 }
-            };
-            final String contactId = arguments.getString(CONTACT_ID);
-            mService.getContactById(contactId, showContactDetails);
+            });
         }
+    }
+
+    private void setOnCheckedChangeListenerBirthday(@NonNull CheckBox birthdayCheckbox) {
+        birthdayCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    setAlarmAboutBirthday();
+                } else {
+                    cancelAlarmAboutBirthday();
+                }
+            }
+        });
     }
 }

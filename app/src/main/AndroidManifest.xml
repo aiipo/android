@@ -22,11 +22,11 @@
         </receiver>
 
         <service
-            android:name=".ContactsService"
+            android:name=".ContactRepository"
             android:enabled="true"
             android:exported="true" />
 
-        <activity android:name=".MainActivity">
+        <activity android:name=".views.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
