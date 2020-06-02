@@ -9,6 +9,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -44,13 +45,7 @@ public class ContactDetailsFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getActivity().setTitle(R.string.toolbar_title_contactDetails);
-        model = new ContactDetailsViewModel(requireActivity().getApplication());
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        model = null;
+        model = new ViewModelProvider(requireActivity()).get(ContactDetailsViewModel.class);
     }
 
     @Override
@@ -110,46 +105,37 @@ public class ContactDetailsFragment extends Fragment {
     }
 
     @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
+    public void onViewCreated(View v, Bundle savedInstanceState) {
         Bundle arguments = getArguments();
-        final WeakReference<View> refView = new WeakReference<>(view);
         if (arguments != null) {
+            final TextView name = v.findViewById(R.id.user_name);
+            final TextView phone = v.findViewById(R.id.phone_main);
+            final TextView email = v.findViewById(R.id.email_main);
+            final ImageView avatar = v.findViewById(R.id.user_photo);
+            final TextView birthday = v.findViewById(R.id.user_birthday);
             final String contactId = arguments.getString(CONTACT_ID);
-            final CheckBox notifyBirthday = view.findViewById(R.id.user_birthday__checkbox);
+            final CheckBox notifyBirthday = v.findViewById(R.id.user_birthday__checkbox);
+
             setOnCheckedChangeListenerBirthday(notifyBirthday);
+
             model.getContact(contactId).observe(getViewLifecycleOwner(), new Observer<Contact>() {
                 @Override
                 public void onChanged(Contact contact) {
-                    if (refView != null) {
-                        thisContact = contact;
-                        final View v = refView.get();
-                        if (v != null && thisContact != null) {
-                            v.post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    if (v != null) {
-                                        TextView name = v.findViewById(R.id.user_name);
-                                        name.setText(thisContact.getName());
-                                        if (thisContact.getPhones().length > 0) {
-                                            TextView phone = v.findViewById(R.id.phone_main);
-                                            phone.setText(thisContact.getPhones()[0]);
-                                        }
-                                        if (thisContact.getEmails().length > 0) {
-                                            TextView email = v.findViewById(R.id.email_main);
-                                            email.setText(thisContact.getEmails()[0]);
-                                        }
-                                        if (thisContact.getImageUri() != null) {
-                                            ImageView avatar = v.findViewById(R.id.user_photo);
-                                            avatar.setImageURI(thisContact.getImageUri());
-                                        }
-                                        if (thisContact.getBirthday() != null) {
-                                            TextView birthday = v.findViewById(R.id.user_birthday);
-                                            birthday.setText(thisContact.getBirthday());
-                                            notifyBirthday.setChecked(isAlarmUp());
-                                        }
-                                    }
-                                }
-                            });
+                    thisContact = contact;
+                    if (thisContact != null) {
+                        name.setText(thisContact.getName());
+                        if (thisContact.getPhones().length > 0) {
+                            phone.setText(thisContact.getPhones()[0]);
+                        }
+                        if (thisContact.getEmails().length > 0) {
+                            email.setText(thisContact.getEmails()[0]);
+                        }
+                        if (thisContact.getImageUri() != null) {
+                            avatar.setImageURI(thisContact.getImageUri());
+                        }
+                        if (thisContact.getBirthday() != null) {
+                            birthday.setText(thisContact.getBirthday());
+                            notifyBirthday.setChecked(isAlarmUp());
                         }
                     }
                 }

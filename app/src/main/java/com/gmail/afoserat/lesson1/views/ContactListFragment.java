@@ -13,6 +13,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.fragment.app.ListFragment;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.gmail.afoserat.lesson1.R;
 import com.gmail.afoserat.lesson1.model.Contact;
@@ -41,13 +42,7 @@ public class ContactListFragment extends ListFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getActivity().setTitle(R.string.toolbar_title_contactList);
-        model = new ContactListViewModel(requireActivity().getApplication());
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        model = null;
+        model = new ViewModelProvider(requireActivity()).get(ContactListViewModel.class);
     }
 
     @Override
