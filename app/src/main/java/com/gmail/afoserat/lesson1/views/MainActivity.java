@@ -13,6 +13,7 @@ import com.gmail.afoserat.lesson1.R;
 
 public class MainActivity extends AppCompatActivity {
     private static final int MY_PERMISSIONS_REQUEST_READ_CONTACTS = 1;
+    private boolean existSavedInstanceState;
 
     private void addContactListFragment() {
         getSupportFragmentManager()
@@ -25,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        existSavedInstanceState = savedInstanceState != null;
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.READ_CONTACTS)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -41,7 +43,9 @@ public class MainActivity extends AppCompatActivity {
         switch (requestCode) {
             case MY_PERMISSIONS_REQUEST_READ_CONTACTS: {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    addContactListFragment();
+                    if (!existSavedInstanceState) {
+                        addContactListFragment();
+                    }
                 } else {
                     Toast.makeText(getApplicationContext(), R.string.allow_read_contacts, Toast.LENGTH_SHORT).show();
                 }
