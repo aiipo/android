@@ -1,4 +1,4 @@
-package com.gmail.afoserat.lesson1;
+package com.gmail.afoserat.lesson1.views;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -8,6 +8,8 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,6 +19,10 @@ import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.gmail.afoserat.lesson1.R;
+import com.gmail.afoserat.lesson1.model.Contact;
+import com.gmail.afoserat.lesson1.viewmodels.ContactDetailsViewModel;
+
 import java.lang.ref.WeakReference;
 import java.util.Calendar;
 
@@ -25,11 +31,7 @@ public class ContactDetailsFragment extends Fragment {
     private static final int NOTIFY_ABOUT_BIRTHDAY_AT_HOUR = 15;
     private static final int NOTIFY_ABOUT_BIRTHDAY_AT_MINUTES = 59;
     private Contact thisContact;
-    ContactsService mService;
-
-    interface ResultDetailsListener {
-        void onComplete(Contact contact);
-    }
+    ContactDetailsViewModel model;
 
     public static ContactDetailsFragment newInstance(String id) {
         ContactDetailsFragment fragment = new ContactDetailsFragment();
@@ -40,23 +42,10 @@ public class ContactDetailsFragment extends Fragment {
     }
 
     @Override
-    public void onAttach(@NonNull Context context) {
-        super.onAttach(context);
-        if (context instanceof ContactListFragment.serviceAvailable) {
-            mService = ((ContactListFragment.serviceAvailable) context).getService();
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mService = null;
-    }
-
-    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getActivity().setTitle(R.string.toolbar_title_contactDetails);
+        model = new ViewModelProvider(requireActivity()).get(ContactDetailsViewModel.class);
     }
 
     @Override
@@ -116,61 +105,54 @@ public class ContactDetailsFragment extends Fragment {
     }
 
     @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
+    public void onViewCreated(View v, Bundle savedInstanceState) {
         Bundle arguments = getArguments();
-        final WeakReference<View> refView = new WeakReference<>(view);
         if (arguments != null) {
-            ResultDetailsListener showContactDetails = new ResultDetailsListener() {
-                @Override
-                public void onComplete(Contact contact) {
-                    if (refView != null) {
-                        thisContact = contact;
-                        final View v = refView.get();
-                        if (v != null && thisContact != null) {
-                            v.post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    if (v != null) {
-                                        TextView name = v.findViewById(R.id.user_name);
-                                        name.setText(thisContact.getName());
-                                        if (thisContact.getPhones().length > 0) {
-                                            TextView phone = v.findViewById(R.id.phone_main);
-                                            phone.setText(thisContact.getPhones()[0]);
-                                        }
-                                        if (thisContact.getEmails().length > 0) {
-                                            TextView email = v.findViewById(R.id.email_main);
-                                            email.setText(thisContact.getEmails()[0]);
-                                        }
-                                        if (thisContact.getImageUri() != null) {
-                                            ImageView avatar = v.findViewById(R.id.user_photo);
-                                            avatar.setImageURI(thisContact.getImageUri());
-                                        }
-                                        if (thisContact.getBirthday() != null) {
-                                            TextView birthday = v.findViewById(R.id.user_birthday);
-                                            CheckBox notifyBirthday = v.findViewById(R.id.user_birthday__checkbox);
+            final TextView name = v.findViewById(R.id.user_name);
+            final TextView phone = v.findViewById(R.id.phone_main);
+            final TextView email = v.findViewById(R.id.email_main);
+            final ImageView avatar = v.findViewById(R.id.user_photo);
+            final TextView birthday = v.findViewById(R.id.user_birthday);
+            final String contactId = arguments.getString(CONTACT_ID);
+            final CheckBox notifyBirthday = v.findViewById(R.id.user_birthday__checkbox);
 
-                                            birthday.setText(thisContact.getBirthday());
-                                            notifyBirthday.setChecked(isAlarmUp());
-                                            notifyBirthday.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                                                @Override
-                                                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                                                    if (isChecked) {
-                                                        setAlarmAboutBirthday();
-                                                    } else {
-                                                        cancelAlarmAboutBirthday();
-                                                    }
-                                                }
-                                            });
-                                        }
-                                    }
-                                }
-                            });
+            setOnCheckedChangeListenerBirthday(notifyBirthday);
+
+            model.getContact(contactId).observe(getViewLifecycleOwner(), new Observer<Contact>() {
+                @Override
+                public void onChanged(Contact contact) {
+                    thisContact = contact;
+                    if (thisContact != null) {
+                        name.setText(thisContact.getName());
+                        if (thisContact.getPhones().length > 0) {
+                            phone.setText(thisContact.getPhones()[0]);
+                        }
+                        if (thisContact.getEmails().length > 0) {
+                            email.setText(thisContact.getEmails()[0]);
+                        }
+                        if (thisContact.getImageUri() != null) {
+                            avatar.setImageURI(thisContact.getImageUri());
+                        }
+                        if (thisContact.getBirthday() != null) {
+                            birthday.setText(thisContact.getBirthday());
+                            notifyBirthday.setChecked(isAlarmUp());
                         }
                     }
                 }
-            };
-            final String contactId = arguments.getString(CONTACT_ID);
-            mService.getContactById(contactId, showContactDetails);
+            });
         }
+    }
+
+    private void setOnCheckedChangeListenerBirthday(@NonNull CheckBox birthdayCheckbox) {
+        birthdayCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    setAlarmAboutBirthday();
+                } else {
+                    cancelAlarmAboutBirthday();
+                }
+            }
+        });
     }
 }
