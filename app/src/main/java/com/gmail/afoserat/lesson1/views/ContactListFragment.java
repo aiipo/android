@@ -3,8 +3,12 @@ package com.gmail.afoserat.lesson1.views;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.SearchView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -65,8 +69,30 @@ public class ContactListFragment extends Fragment implements ContactRecyclerView
             });
             recyclerView.addItemDecoration(new ContactDecorator(ContextCompat.getDrawable(getContext(), R.drawable.divider)));
             recyclerView.setAdapter(contactAdapter);
+
+            setHasOptionsMenu(true);
         }
         return view;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.menu, menu);
+        MenuItem mSearch = menu.findItem(R.id.app_bar_search);
+        SearchView mSearchView = (SearchView) mSearch.getActionView();
+        mSearchView.setQueryHint(getString(R.string.searchBar));
+        mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                model.updateContacts(newText);
+                return true;
+            }
+        });
     }
 
     @Override

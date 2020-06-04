@@ -57,8 +57,7 @@ public class ContactRecyclerViewAdapter extends ListAdapter<Contact, ContactView
                 public boolean areContentsTheSame(
                         @NonNull Contact oldContact, @NonNull Contact newContact) {
                     return oldContact.getId().equals(newContact.getId())
-                            && oldContact.getName().equals(newContact.getName())
-                            && oldContact.getBirthday().equals(newContact.getBirthday());
+                            && oldContact.getName().equals(newContact.getName());
                 }
             };
 }
