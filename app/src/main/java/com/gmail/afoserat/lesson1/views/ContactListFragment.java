@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Observer;
@@ -17,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.gmail.afoserat.lesson1.R;
 import com.gmail.afoserat.lesson1.adapters.ContactRecyclerViewAdapter;
+import com.gmail.afoserat.lesson1.decorators.ContactDecorator;
 import com.gmail.afoserat.lesson1.model.Contact;
 import com.gmail.afoserat.lesson1.viewmodels.ContactListViewModel;
 
@@ -61,6 +63,7 @@ public class ContactListFragment extends Fragment implements ContactRecyclerView
                     contactAdapter.setContactList(contacts);
                 }
             });
+            recyclerView.addItemDecoration(new ContactDecorator(ContextCompat.getDrawable(getContext(), R.drawable.divider)));
             recyclerView.setAdapter(contactAdapter);
         }
         return view;
