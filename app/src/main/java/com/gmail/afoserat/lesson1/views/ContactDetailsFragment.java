@@ -105,7 +105,7 @@ public class ContactDetailsFragment extends Fragment {
     }
 
     @Override
-    public void onViewCreated(View v, Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View v, Bundle savedInstanceState) {
         Bundle arguments = getArguments();
         if (arguments != null) {
             final TextView name = v.findViewById(R.id.user_name);
