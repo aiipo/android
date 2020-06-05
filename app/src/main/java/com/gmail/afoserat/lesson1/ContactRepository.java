@@ -5,6 +5,8 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.provider.ContactsContract;
 
+import androidx.annotation.Nullable;
+
 import com.gmail.afoserat.lesson1.model.Contact;
 
 import java.lang.ref.WeakReference;
@@ -22,13 +24,16 @@ public class ContactRepository {
         ref = new WeakReference<>(contentResolver);
     }
 
-    public ArrayList<Contact> getContacts() {
+    public ArrayList<Contact> getContacts(@Nullable String nameSelector) {
         final ContentResolver contentResolver = ref.get();
         if (contentResolver != null) {
             ArrayList<Contact> contacts = new ArrayList<>();
+            String selection = nameSelector != null
+                    ? ContactsContract.Contacts.DISPLAY_NAME + " LIKE '%" + nameSelector + "%'"
+                    : null;
             Cursor cursor = contentResolver.query(ContactsContract.Contacts.CONTENT_URI,
                     null,
-                    null,
+                    selection,
                     null,
                     null
             );

@@ -3,6 +3,7 @@ package com.gmail.afoserat.lesson1.viewmodels;
 import android.app.Application;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -24,16 +25,22 @@ public class ContactListViewModel extends AndroidViewModel {
     public LiveData<ArrayList<Contact>> getContacts() {
         if (contactList == null) {
             contactList = new MutableLiveData<>();
-            loadContacts();
+            loadContacts(null);
         }
         return contactList;
     }
 
-    private void loadContacts() {
+    public void updateContacts(@Nullable String selector) {
+        if (contactList != null) {
+            loadContacts(selector);
+        }
+    }
+
+    private void loadContacts(@Nullable final String selector) {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                contactList.postValue(repository.getContacts());
+                contactList.postValue(repository.getContacts(selector));
             }
         }).start();
     }
